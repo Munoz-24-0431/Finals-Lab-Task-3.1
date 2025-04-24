@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finals Lab Task 3.1 - Using MySQL Clause</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --space-dark: #0a0b1a;
+            --space-light: #2d3252;
+            --star-color: #ffffff;
+            --accent-purple: #9d4edd;
+            --accent-blue: #48bfe3;
+            --text-color: #e2e2e2;
+            --link-color: #a991ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--space-dark);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .cosmic-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1b4b 0%, #0a0b1a 100%);
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            padding: 4rem 0;
+            position: relative;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 3s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 2.8rem;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+            letter-spacing: 1px;
+            font-weight: 400;
+        }
+
+        .content-section {
+            background: rgba(45, 50, 82, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            transform: translateY(50px);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .image-container {
+            position: relative;
+            margin: 2rem 0;
+            border-radius: 15px;
+            overflow: hidden;
+            transform: translateY(30px);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards 0.3s;
+            cursor: pointer;
+            background: rgba(45, 50, 82, 0.3);
+            padding: 1rem;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            transition: all 0.5s ease;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            transition: transform 0.5s ease;
+        }
+
+        .image-container:hover img {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.3);
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(157, 78, 221, 0.2), rgba(72, 191, 227, 0.2));
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-container:hover .image-overlay {
+            opacity: 1;
+        }
+
+        h2 {
+            color: var(--accent-purple);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        h3 {
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        ul li {
+            position: relative;
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        ul li::before {
+            content: '★';
+            color: var(--accent-blue);
+            position: absolute;
+            left: 0;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        ul li:hover {
+            transform: translateX(10px);
+            color: var(--accent-blue);
+            text-shadow: 0 0 8px rgba(72, 191, 227, 0.5);
+        }
+
+        ul li:hover::before {
+            transform: rotate(180deg);
+            color: var(--accent-purple);
+        }
+
+        .process-list li::before {
+            content: '★';
+            color: var(--accent-blue);
+            position: absolute;
+            left: -1.5rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(157, 78, 221, 0.5); }
+            50% { text-shadow: 0 0 40px rgba(72, 191, 227, 0.8); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: var(--star-color);
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.8); }
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 11, 26, 0.95);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(157, 78, 221, 0.3);
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            display: block;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(45, 50, 82, 0.8);
+            border: 2px solid var(--accent-purple);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-purple);
+            transform: rotate(90deg);
+        }
+
+        /* Download Button */
+        .main-download-section {
+            text-align: center;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(45, 50, 82, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .main-download-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.3);
+        }
+
+        .main-download-section h2 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 30px;
+            background: rgba(45, 50, 82, 0.8);
+            border: 2px solid var(--accent-purple);
+            color: var(--text-color);
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            background: var(--accent-purple);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(157, 78, 221, 0.4);
+        }
+
+        .download-btn i {
+            font-size: 24px;
+        }
+
+        .download-btn .text {
+            position: relative;
+        }
+
+        .download-btn .text::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: var(--accent-blue);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .download-btn:hover .text::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Galaxy Effects */
+        .image-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(157, 78, 221, 0.1),
+                rgba(72, 191, 227, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: galaxyShine 3s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes galaxyShine {
+            0% {
+                transform: rotate(45deg) translateX(-100%);
+            }
+            100% {
+                transform: rotate(45deg) translateX(100%);
+            }
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Stars particle effect */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--star-color);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9997;
+            transition: all 1s ease-out;
+        }
+
+        /* Enhanced project description */
+        .project-description {
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            padding: 1.5rem;
+            background: rgba(45, 50, 82, 0.3);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-purple);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-description:hover {
+            transform: translateY(-5px) scale(1.01);
+            background: rgba(45, 50, 82, 0.5);
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.3);
+            border-left-color: var(--accent-blue);
+        }
+
+        .project-description::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(157, 78, 221, 0.1),
+                rgba(72, 191, 227, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: descriptionShine 3s linear infinite;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .project-description:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes descriptionShine {
+            0% {
+                transform: rotate(45deg) translateX(-100%);
+            }
+            100% {
+                transform: rotate(45deg) translateX(100%);
+            }
+        }
+
+        /* Enhanced process info */
+        .process-info {
+            background: rgba(45, 50, 82, 0.4);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent-blue);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process-info:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
+            border-left-color: var(--accent-purple);
+        }
+
+        .process-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(157, 78, 221, 0.1),
+                rgba(72, 191, 227, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: infoShine 3s linear infinite;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .process-info:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes infoShine {
+            0% {
+                transform: rotate(45deg) translateX(-100%);
+            }
+            100% {
+                transform: rotate(45deg) translateX(100%);
+            }
+        }
+
+        /* Enhanced process details */
+        .process-details {
+            background: rgba(45, 50, 82, 0.4);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            border-left: 5px solid var(--accent-purple);
+            transition: all 0.3s ease;
+        }
+
+        .process-details h3 {
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .process-details p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        /* Enhanced cursor styles */
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-purple);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s ease;
+            mix-blend-mode: difference;
+        }
+
+        .custom-cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .custom-cursor.hover {
+            transform: scale(1.5);
+            background: rgba(157, 78, 221, 0.2);
+            border-color: var(--accent-blue);
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.8;
+            transition: opacity 0.5s ease;
+            animation: trailFade 0.5s ease forwards;
+        }
+
+        @keyframes trailFade {
+            0% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.2);
+            }
+        }
+
+        /* Interactive text animations */
+        .content-section h2 {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .content-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+            transition: width 0.3s ease;
+        }
+
+        .content-section h2:hover::after {
+            width: 100%;
+        }
+
+        .process-info:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* Enhanced interactive features */
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-purple);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s ease;
+            mix-blend-mode: difference;
+        }
+
+        .custom-cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .custom-cursor.hover {
+            transform: scale(1.5);
+            background: rgba(157, 78, 221, 0.2);
+            border-color: var(--accent-blue);
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.8;
+            transition: opacity 0.5s ease;
+            animation: trailFade 0.5s ease forwards;
+        }
+
+        @keyframes trailFade {
+            0% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.2);
+            }
+        }
+
+        /* Enhanced text interactions */
+        .step-title:hover {
+            transform: translateX(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .code-block {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .code-block:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(157, 78, 221, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .code-block:hover::before {
+            transform: translateX(100%);
+        }
+
+        .step-section ul li {
+            transition: all 0.3s ease;
+        }
+
+        .step-section ul li:hover {
+            transform: translateX(10px);
+            color: var(--accent-blue);
+            text-shadow: 0 0 8px rgba(72, 191, 227, 0.5);
+        }
+
+        .project-description:hover {
+            background: rgba(45, 50, 82, 0.5);
+            padding: 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.2);
+        }
+
+        /* Particle effect */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--star-color);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9997;
+        }
+
+        /* Enhanced database structure section */
+        .database-structure {
+            background: rgba(45, 50, 82, 0.3);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+        }
+
+        .database-structure h3 {
+            color: var(--accent-purple);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .database-structure ul {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        .database-structure ul li {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .database-structure ul li::before {
+            content: '★';
+            color: var(--accent-blue);
+            position: absolute;
+            left: -1.5rem;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="cosmic-background"></div>
+    <div class="stars"></div>
+    <div class="custom-cursor"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Finals Lab Task 3.1</h1>
+            <p class="subtitle">Using MySQL Clause</p>
+        </header>
+
+        <section class="content-section">
+            <h2>Project Overview</h2>
+            <p class="project-description">
+                This project demonstrates the implementation of MySQL clauses for analyzing and managing course enrollment data. We work with a comprehensive database of courses to perform various analytical queries, examining enrollment patterns, category distributions, and capacity utilization.
+            </p>
+            
+            <div class="database-structure">
+                <h3>Database Structure</h3>
+                <ul>
+                    <li><strong>Table Name:</strong> courses</li>
+                    <li><strong>Id:</strong> Unique integer, auto-increment, primary key</li>
+                    <li><strong>course_name:</strong> String (VARCHAR), not null - Stores the name of each course</li>
+                    <li><strong>category:</strong> String (VARCHAR), not null - Defines the course category</li>
+                    <li><strong>enrollment_limit:</strong> Integer, not null - Maximum number of students allowed</li>
+                    <li><strong>students_enrolled:</strong> Integer, not null - Current number of enrolled students</li>
+                    <li><strong>Data Volume:</strong> 20 courses pre-populated in the database</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Initial Database Setup</h2>
+            <div class="process-details">
+                <h3>Query Statement</h3>
+                <p>Initial database structure and course data setup.</p>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/54ee6185-44da-4673-89eb-17a9549c291d" alt="Initial Query Statement">
+                <div class="image-overlay"></div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Task 1 - Available Enrollment</h2>
+            <div class="process-details">
+                <h3>Query Statement</h3>
+                <p>Retrieve all courses where students_enrolled is less than the enrollment limit.</p>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/0ac1e0ba-bcb1-4e00-a0ac-2428b7e6240f" alt="Task 1 Query">
+                <div class="image-overlay"></div>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/b944b778-7c2c-476b-bc20-6a44405e8c35" alt="Task 1 Results">
+                <div class="image-overlay"></div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Task 2 - Category Analysis</h2>
+            <div class="process-details">
+                <h3>Query Statement</h3>
+                <p>Group courses by category and calculate the total number of students enrolled for each category.</p>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/794edbca-785e-4fd5-9341-9436a7befb76" alt="Task 2 Query">
+                <div class="image-overlay"></div>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/a93842fe-7941-4c80-bbc1-c68125ff6767" alt="Task 2 Results">
+                <div class="image-overlay"></div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Task 3 - Full Enrollment Check</h2>
+            <div class="process-details">
+                <h3>Query Statement</h3>
+                <p>Retrieve the courses that are fully enrolled (i.e., students_enrolled equals enrollment_limit).</p>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/93a867f0-199f-4c0a-9fc2-512d8c66d4c5" alt="Task 3 Query">
+                <div class="image-overlay"></div>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/ce9e503b-86d1-42ed-b80b-6f35a12ff8cf" alt="Task 3 Results">
+                <div class="image-overlay"></div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Task 4 - Total Enrollment</h2>
+            <div class="process-details">
+                <h3>Query Statement</h3>
+                <p>Calculate the total number of students enrolled across all courses.</p>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/54e99c9e-15e4-4c4a-a04f-243d41c3a132" alt="Task 4 Query">
+                <div class="image-overlay"></div>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/ffc72ab1-1307-4533-9da1-286e9e69b133" alt="Task 4 Results">
+                <div class="image-overlay"></div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Task 5 - Enrollment Order</h2>
+            <div class="process-details">
+                <h3>Query Statement</h3>
+                <p>Sort courses by students_enrolled in ascending order.</p>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/44a1b593-8639-48aa-84b5-e0c155a5671e" alt="Task 5 Query">
+                <div class="image-overlay"></div>
+            </div>
+            <div class="image-container" data-fullscreen>
+                <img src="https://github.com/user-attachments/assets/4c552245-c89a-4dac-94f8-f9da18bc1959" alt="Task 5 Results">
+                <div class="image-overlay"></div>
+            </div>
+        </section>
+
+        <section class="main-download-section">
+            <h2>Download Project File</h2>
+            <a href="https://github.com/user-attachments/files/19895932/Finals.Task.3.Using.MYSQL.Clause.Munoz.docx" class="download-btn" download>
+                <i class="fas fa-file-word"></i>
+                <span class="text">Download Documentation</span>
+            </a>
+        </section>
+    </div>
+
+    <!-- Modal for fullscreen images -->
+    <div class="modal">
+        <div class="modal-content">
+            <img src="" alt="">
+            <button class="modal-close">×</button>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        // Create stars
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numberOfStars = 200;
+
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 3}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.setProperty('--duration', `${Math.random() * 3 + 1}s`);
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            createStars();
+        });
+
+        // Enhanced Meteor Cursor Effect
+        document.addEventListener('DOMContentLoaded', () => {
+            const cursor = document.querySelector('.custom-cursor');
+            let isMoving = false;
+            let moveTimeout;
+            let lastX = 0;
+            let lastY = 0;
+            let velocity = { x: 0, y: 0 };
+
+            function updateCursor(e) {
+                const currentX = e.clientX;
+                const currentY = e.clientY;
+                
+                // Calculate velocity
+                velocity.x = currentX - lastX;
+                velocity.y = currentY - lastY;
+                
+                cursor.style.left = currentX + 'px';
+                cursor.style.top = currentY + 'px';
+
+                const speed = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+                
+                if (!isMoving) {
+                    isMoving = true;
+                    cursor.style.transform = `translate(-50%, -50%) scale(${0.8 + speed * 0.01})`;
+                }
+
+                clearTimeout(moveTimeout);
+                moveTimeout = setTimeout(() => {
+                    isMoving = false;
+                    cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 100);
+
+                // Create more trails based on movement speed
+                if (speed > 5) {
+                    for (let i = 0; i < Math.min(speed / 5, 3); i++) {
+                        createTrail(currentX, currentY, speed);
+                    }
+                }
+
+                lastX = currentX;
+                lastY = currentY;
+            }
+
+            function createTrail(x, y, speed) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                trail.style.left = x + 'px';
+                trail.style.top = y + 'px';
+                
+                // Adjust trail size based on cursor speed
+                const size = Math.min(4 + speed * 0.2, 8);
+                trail.style.width = `${size}px`;
+                trail.style.height = `${size}px`;
+                
+                document.body.appendChild(trail);
+
+                setTimeout(() => {
+                    trail.remove();
+                }, 500);
+            }
+
+            document.addEventListener('mousemove', updateCursor);
+
+            // Enhanced hover effects on interactive elements
+            const interactiveElements = document.querySelectorAll('a, button, .content-section, .image-container, .download-btn, .step-title, .process-info, .process-details');
+            
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.classList.add('hover');
+                    if (el.classList.contains('process-info') || el.classList.contains('process-details')) {
+                        createParticleExplosion(el);
+                    }
+                });
+                
+                el.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('hover');
+                });
+            });
+
+            function createParticleExplosion(element) {
+                const rect = element.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                for (let i = 0; i < 8; i++) {
+                    createParticle(centerX, centerY);
+                }
+            }
+
+            function createParticle(x, y) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                document.body.appendChild(particle);
+
+                const destinationX = x + (Math.random() - 0.5) * 200;
+                const destinationY = y + (Math.random() - 0.5) * 200;
+                const rotation = Math.random() * 520;
+                const delay = Math.random() * 200;
+
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.transform = `rotate(${rotation}deg)`;
+                particle.style.opacity = '0';
+
+                setTimeout(() => {
+                    particle.style.transition = 'all 1s ease-out';
+                    particle.style.left = `${destinationX}px`;
+                    particle.style.top = `${destinationY}px`;
+                    particle.style.opacity = '1';
+                    
+                    setTimeout(() => {
+                        particle.style.opacity = '0';
+                        setTimeout(() => {
+                            particle.remove();
+                        }, 1000);
+                    }, 500);
+                }, delay);
+            }
+        });
+
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
+
+        document.querySelectorAll('.content-section').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Fullscreen Image Modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.querySelector('.modal');
+            const modalImg = modal.querySelector('img');
+            const closeBtn = modal.querySelector('.modal-close');
+            const images = document.querySelectorAll('.image-container[data-fullscreen]');
+
+            images.forEach(container => {
+                container.addEventListener('click', (e) => {
+                    const img = container.querySelector('img');
+                    if (img && !e.target.classList.contains('download-btn')) {
+                        modalImg.src = img.src;
+                        modalImg.alt = img.alt;
+                        modal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                        setTimeout(() => {
+                            modal.querySelector('.modal-content').style.opacity = '1';
+                        }, 50);
+                    }
+                });
+            });
+
+            closeBtn.addEventListener('click', () => {
+                modal.querySelector('.modal-content').style.opacity = '0';
+                setTimeout(() => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }, 300);
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.querySelector('.modal-content').style.opacity = '0';
+                    setTimeout(() => {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }, 300);
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    modal.querySelector('.modal-content').style.opacity = '0';
+                    setTimeout(() => {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }, 300);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
